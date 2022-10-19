@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Products from "./Products";
 
 export const Searchbar = (props: any) => {
   const firstRender = useRef<boolean>(true);
@@ -8,14 +9,18 @@ export const Searchbar = (props: any) => {
   const categoryDOM = useRef() as React.MutableRefObject<HTMLSelectElement>;
   const minPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
   const maxPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const resultsDOM = useRef() as React.MutableRefObject<HTMLDivElement>;
+  const [currentFiltered, setCurrentFiltered] = useState(props.DBListings);
   const [categoryArr, setCategoryArr] = useState<string[]>([]);
   const [colorsArr, setColorsArr] = useState<string[]>([]);
 
   const populateFilters = () => {
     for (const i in props.DBListings) {
-      props.DBListings[i].node.categoryTags?.forEach((elem: string) => categorySet.add(elem));
-      props.DBListings[i].node.colorFamily?.forEach((elem: { name: string }) => colorsSet.add(elem.name));
+      props.DBListings[i].node.categoryTags?.forEach((elem: string) =>
+        categorySet.add(elem)
+      );
+      props.DBListings[i].node.colorFamily?.forEach((elem: { name: string }) =>
+        colorsSet.add(elem.name)
+      );
     }
     setCategoryArr(Array.from(categorySet));
     setColorsArr(Array.from(colorsSet));
@@ -23,45 +28,84 @@ export const Searchbar = (props: any) => {
     colorsSet.clear();
   };
 
-  const filterDatabase = (color: string, category: string, minPrice: string, maxPrice: string) => {
-    console.log(color, category);
-
+  const filterDatabase = (
+    color: string,
+    category: string,
+    minPrice: string,
+    maxPrice: string
+  ) => {
     let filterColor;
     if (color === "Color") {
       filterColor = props.DBListings;
     } else {
       filterColor = props.DBListings.filter((entry: any) => {
-        if (entry.node.colorFamily !== null) return entry.node.colorFamily[0].name === color;
+        if (entry.node.colorFamily !== null)
+          return entry.node.colorFamily[0].name === color;
       });
     }
 
     let filterCategory;
-    if (filterCategory === "Category") {
+    if (category === "Category") {
       filterCategory = filterColor;
     } else {
       filterCategory = filterColor.filter((entry: any) => {
-        return entry.node.categoryTags.includes(category);
+        if (entry.node.categoryTags !== null)
+          return entry.node.categoryTags.includes(category);
       });
     }
+    // console.log(filterCategory);
 
     const filterPrice = filterCategory.filter((entry: any) => {
-      return entry.node.shopifyProductEu.variants.edges[0].node.price >= minPrice && entry.node.shopifyProductEu.variants.edges[0].node.price <= maxPrice;
+      // console.log("filtering price");
+      return (
+        entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice &&
+        entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice
+      );
     });
-    console.log(filterPrice);
-    return filterPrice.length > 0 ? "ok!" : "There are no product matching all the selected filters, please try a less narrow search.";
+    // console.log(filterPrice);
+    return filterPrice;
+  };
+
+  // keep max currency value higher than minumum and in between its min and max range
+  const matchMaxToMin = () => {
+    if (
+      +minPriceDOM.current.value >= +maxPriceDOM.current.value &&
+      +maxPriceDOM.current.value <=
+        +maxPriceDOM.current.max - +maxPriceDOM.current.step
+    ) {
+      maxPriceDOM.current.value = (
+        +minPriceDOM.current.value + +maxPriceDOM.current.step
+      ).toString();
+    }
+  };
+  // keep min currency value lower than maximum and in between its min and max range
+  const matchMinToMax = () => {
+    if (
+      +maxPriceDOM.current.value <= +minPriceDOM.current.value &&
+      +minPriceDOM.current.value >=
+        +minPriceDOM.current.min + +minPriceDOM.current.step
+    ) {
+      minPriceDOM.current.value = (
+        +maxPriceDOM.current.value - +minPriceDOM.current.step
+      ).toString();
+    }
   };
 
   const updateSearchValues = () => {
-    console.time("updateSearchValues");
     const color = colorDOM.current.selectedOptions[0].value;
     const category = categoryDOM.current.selectedOptions[0].value;
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
-    console.timeEnd("updateSearchValues");
     console.time("filterDatabase");
-    const filteredDatabase = filterDatabase(color, category, minPrice, maxPrice);
+    const filteredDatabase: any = filterDatabase(
+      color,
+      category,
+      minPrice,
+      maxPrice
+    );
     console.timeEnd("filterDatabase");
-    resultsDOM.current.textContent = filteredDatabase;
+    console.log(filteredDatabase);
+    setCurrentFiltered(filteredDatabase);
   };
 
   useEffect(() => {
@@ -73,20 +117,24 @@ export const Searchbar = (props: any) => {
     }
   });
 
+  useEffect(() => {
+    console.log("currentFiltered change, is now:");
+    console.log(currentFiltered);
+  }, [currentFiltered]);
+
   return (
     <>
       <select
         ref={colorDOM}
         title="colors"
         id="colors"
-        onChange={updateSearchValues}>
-        <option value="Color">Any Color</option>
+        onChange={updateSearchValues}
+      >
+        <option value="Color">Color</option>
         <>
           {colorsArr.map((color) => {
             return (
-              <option
-                value={color}
-                key={color}>
+              <option value={color} key={color}>
                 {color}
               </option>
             );
@@ -97,8 +145,9 @@ export const Searchbar = (props: any) => {
         ref={categoryDOM}
         title="category"
         id="category"
-        onChange={updateSearchValues}>
-        <option value="Category">Any Category</option>
+        onChange={updateSearchValues}
+      >
+        <option value="Category">Category</option>
         <>
           {categoryArr.map((category) => {
             return <option key={category}>{category}</option>;
@@ -109,34 +158,27 @@ export const Searchbar = (props: any) => {
         ref={minPriceDOM}
         type="number"
         min="0"
-        max="200"
-        step="5"
+        max="1000"
+        step="25"
         defaultValue="0"
-        onChange={updateSearchValues}
+        onChange={() => {
+          updateSearchValues();
+          matchMaxToMin();
+        }}
       />
       <input
         ref={maxPriceDOM}
         type="number"
-        min="50"
+        min="0"
         max="1000"
-        step="20"
+        step="25"
         defaultValue="1000"
-        onChange={updateSearchValues}
+        onChange={() => {
+          updateSearchValues();
+          matchMinToMax();
+        }}
       />
-      <div
-        className="results"
-        ref={resultsDOM}>
-        ciao
-      </div>
+      <Products currentFiltered={currentFiltered} />
     </>
   );
 };
-
-// We need to have the possibility to filter
-// a. Color(color family name)
-// b. Price(price range between x and x)
-// c. Category tags(for example sandals, mid-heels, etc)
-// 2. Use Next, Gatsby or CRA (if you want to impress? use our current stack)
-// 3. Use pagination so not all products are loaded at once
-// 4. All the filters need to accept multiple parameters
-// 5. The user should be able to combine the filter parameters together

@@ -1,0 +1,35 @@
+* {
+  box-sizing: content-box
+}
+
+body {
+  margin: 1vh 1vw;
+  padding: 0;
+}
+
+ul.pagination {
+  margin-top: 20px;
+}
+
+ul.pagination li {
+  display: inline-block;
+  margin: 0 5px;
+}
+
+ul.pagination li:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.items {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  width: 98vw;
+  margin-top: 20px;
+}
+
+.items .singleItem {
+  outline: 1px solid black;
+  padding: 10px;
+}
