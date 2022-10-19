@@ -53,16 +53,13 @@ export const Searchbar = (props: any) => {
           return entry.node.categoryTags.includes(category);
       });
     }
-    // console.log(filterCategory);
 
     const filterPrice = filterCategory.filter((entry: any) => {
-      // console.log("filtering price");
       return (
         entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice &&
         entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice
       );
     });
-    // console.log(filterPrice);
     return filterPrice;
   };
 
@@ -104,7 +101,6 @@ export const Searchbar = (props: any) => {
       maxPrice
     );
     console.timeEnd("filterDatabase");
-    console.log(filteredDatabase);
     setCurrentFiltered(filteredDatabase);
   };
 
@@ -116,11 +112,6 @@ export const Searchbar = (props: any) => {
       firstRender.current = false;
     }
   });
-
-  useEffect(() => {
-    console.log("currentFiltered change, is now:");
-    console.log(currentFiltered);
-  }, [currentFiltered]);
 
   return (
     <>

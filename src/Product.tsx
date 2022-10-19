@@ -1,8 +1,8 @@
 function Product(props: any) {
   return (
     <div className="items">
-      {props.currentItems &&
-        props.currentItems.map((item: any, index: number) => {
+      {props.currentPagination &&
+        props.currentPagination.map((item: any, index: number) => {
           return (
             <div className="singleItem" key={index}>
               {item.node.name}
