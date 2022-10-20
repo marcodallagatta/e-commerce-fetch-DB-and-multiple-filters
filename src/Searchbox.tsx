@@ -28,6 +28,8 @@ export const Searchbar = (props: any) => {
     colorsSet.clear();
   };
 
+  const userChoosenColors = ["White", "Green"];
+
   const filterDatabase = (
     color: string,
     category: string,
@@ -35,12 +37,29 @@ export const Searchbar = (props: any) => {
     maxPrice: string
   ) => {
     let filterColor;
+    // if no color is choosen
     if (color === "Color") {
       filterColor = props.DBListings;
     } else {
       filterColor = props.DBListings.filter((entry: any) => {
-        if (entry.node.colorFamily !== null)
-          return entry.node.colorFamily[0].name === color;
+        // if there is a color for the product
+        if (entry.node.colorFamily !== null) {
+          if (userChoosenColors.length > 1) {
+            if (entry.node.colorFamily.length > 1) {
+              // if multiple colors are available for product
+              const productColors = entry.node.colorFamily.map(
+                (color: any) => color.name
+              );
+              let checker = userChoosenColors.every((v) =>
+                productColors.includes(v)
+              );
+              if (checker) return entry;
+            }
+          } else {
+            // if a single color is available for product
+            return entry.node.colorFamily[0].name === color;
+          }
+        }
       });
     }
 
