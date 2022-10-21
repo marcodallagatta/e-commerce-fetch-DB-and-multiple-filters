@@ -33,3 +33,11 @@ ul.pagination li:hover {
   outline: 1px solid black;
   padding: 10px;
 }
+
+#category,
+#colors {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid black;
+  padding: 5px 0;
+}
