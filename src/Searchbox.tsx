@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import Products from "./Products";
 
-export const Searchbar = (props: any) => {
+export const Searchbox = (props: any) => {
   const firstRender = useRef<boolean>(true);
   const categorySet = new Set<string>();
   const colorsSet = new Set<string>();
-  const colorDOM = useRef() as React.MutableRefObject<HTMLSelectElement>;
+  const colorDOM = useRef() as React.MutableRefObject<HTMLFormElement>;
   const categoryDOM = useRef() as React.MutableRefObject<HTMLSelectElement>;
   const minPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
   const maxPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
@@ -28,40 +28,41 @@ export const Searchbar = (props: any) => {
     colorsSet.clear();
   };
 
-  const userChoosenColors = ["White", "Green"];
-
   const filterDatabase = (
-    color: string,
+    color: string[],
     category: string,
     minPrice: string,
     maxPrice: string
   ) => {
+    console.log(color);
     let filterColor;
     // if no color is choosen
-    if (color === "Color") {
+    if (color.length === 0) {
       filterColor = props.DBListings;
+    } else if (color.length === 1) {
+      filterColor = props.DBListings.filter((entry: any) => {
+        // if there is a color for the product
+        if (entry.node.colorFamily !== null) {
+          // if a single color is available for product
+          return entry.node.colorFamily[0].name === color[0];
+        }
+      });
     } else {
       filterColor = props.DBListings.filter((entry: any) => {
         // if there is a color for the product
         if (entry.node.colorFamily !== null) {
-          if (userChoosenColors.length > 1) {
-            if (entry.node.colorFamily.length > 1) {
-              // if multiple colors are available for product
-              const productColors = entry.node.colorFamily.map(
-                (color: any) => color.name
-              );
-              let checker = userChoosenColors.every((v) =>
-                productColors.includes(v)
-              );
-              if (checker) return entry;
-            }
-          } else {
-            // if a single color is available for product
-            return entry.node.colorFamily[0].name === color;
+          if (color.length > 1 && entry.node.colorFamily.length > 1) {
+            // if multiple colors are available for product
+            const productColors = entry.node.colorFamily.map(
+              (color: any) => color.name
+            );
+            let checker = color.every((col) => productColors.includes(col));
+            if (checker) return entry;
           }
         }
       });
     }
+    console.log(filterColor);
 
     let filterCategory;
     if (category === "Category") {
@@ -108,7 +109,11 @@ export const Searchbar = (props: any) => {
   };
 
   const updateSearchValues = () => {
-    const color = colorDOM.current.selectedOptions[0].value;
+    console.log("search values");
+    let color: string[] = [];
+    colorDOM.current
+      .querySelectorAll("input[type=checkbox]:checked")
+      .forEach((check) => color.push(check.value));
     const category = categoryDOM.current.selectedOptions[0].value;
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
@@ -134,23 +139,25 @@ export const Searchbar = (props: any) => {
 
   return (
     <>
-      <select
+      <form
         ref={colorDOM}
         title="colors"
         id="colors"
         onChange={updateSearchValues}
       >
-        <option value="Color">Color</option>
         <>
           {colorsArr.map((color) => {
             return (
-              <option value={color} key={color}>
-                {color}
-              </option>
+              <div key={color}>
+                <input type="checkbox" value={color} id={color} />
+                <label htmlFor={color}>{color}</label>
+              </div>
+              // {color}
+              // </input>
             );
           })}
         </>
-      </select>
+      </form>
       <select
         ref={categoryDOM}
         title="category"
