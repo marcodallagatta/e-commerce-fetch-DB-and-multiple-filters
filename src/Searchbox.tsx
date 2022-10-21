@@ -58,7 +58,6 @@ export const Searchbox = (props: any) => {
         }
       });
     }
-    console.log(filterColor);
 
     let filterCategory;
     // if no category is choosen
@@ -90,7 +89,6 @@ export const Searchbox = (props: any) => {
         }
       });
     }
-    console.log(filterCategory);
 
     const filterPrice = filterCategory.filter((entry: any) => {
       return (
@@ -130,13 +128,12 @@ export const Searchbox = (props: any) => {
   const updateSearchValues = () => {
     let color: string[] = [];
     let category: string[] = [];
-    colorDOM.current
-      .querySelectorAll("input[type=checkbox]:checked")
+    document
+      .querySelectorAll("form#colors input[type=checkbox]:checked")
       .forEach((check) => color.push(check.value));
     categoryDOM.current
-      .querySelectorAll("input[type=checkbox]:checked")
+      .querySelectorAll("form#category input[type=checkbox]:checked")
       .forEach((check) => category.push(check.value));
-    // const category = categoryDOM.current.selectedOptions[0].value;
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
     const filteredDatabase: any = filterDatabase(
