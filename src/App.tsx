@@ -1,5 +1,6 @@
+import React from "react";
+import DB from "./miista-export.json";
 import { Searchbox } from "./Searchbox";
-import DB from "../miista-export.json";
 
 function App() {
   return (

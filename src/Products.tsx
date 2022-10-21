@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
-import { SingleProduct, ListOfProducts } from "../TSinterfaces";
+import { ListOfProducts } from "../TSinterfaces";
 import Product from "./Product";
 
 const Products = (props: { currentFiltered: ListOfProducts }) => {

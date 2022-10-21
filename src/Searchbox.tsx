@@ -34,18 +34,19 @@ export const Searchbox = (props: { DBListings: ListOfProducts }) => {
     } else {
       // if colors are choosen
       filterColor = props.DBListings.filter((entry: SingleProduct) => {
-        if (entry.node.colorFamily === null) return;
+        if (entry.node.colorFamily === null) return false;
         if (color.length === 1) {
           // one color is choosen
           return entry.node.colorFamily[0].name === color[0];
         } else if (color.length > 1) {
           // more than one color is choosen
           if (color.length > 1 && entry.node.colorFamily.length > 1) {
-            const productColors = entry.node.colorFamily.map((color: {name: string}) => color.name);
+            const productColors = entry.node.colorFamily.map((color: { name: string }) => color.name);
             let checker = color.every((col) => productColors.includes(col));
             if (checker) return entry;
           }
         }
+        return false;
       });
     }
 
@@ -56,7 +57,7 @@ export const Searchbox = (props: { DBListings: ListOfProducts }) => {
     } else {
       // if categories are choosen
       filterCategory = filterColor.filter((entry: SingleProduct) => {
-        if (entry.node.categoryTags === null || entry.node?.categoryTags.length < 1) return;
+        if (entry.node.categoryTags === null || entry.node?.categoryTags.length < 1) return false;
         if (category.length === 1) {
           // one category is choosen
           return entry.node.categoryTags[0] === category[0];
@@ -67,6 +68,7 @@ export const Searchbox = (props: { DBListings: ListOfProducts }) => {
             if (checker) return entry;
           }
         }
+        return false;
       });
     }
 
