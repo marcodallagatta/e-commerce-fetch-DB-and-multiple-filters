@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { SingleProduct, ListOfProducts } from "../TSinterfaces";
 import Products from "./Products";
 
-export const Searchbox = (props: any) => {
+export const Searchbox = (props: { DBListings: ListOfProducts }) => {
   const firstRender = useRef<boolean>(true);
   const categorySet = new Set<string>();
   const colorsSet = new Set<string>();
@@ -9,7 +10,7 @@ export const Searchbox = (props: any) => {
   const categoryDOM = useRef() as React.MutableRefObject<HTMLFormElement>;
   const minPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
   const maxPriceDOM = useRef() as React.MutableRefObject<HTMLInputElement>;
-  const [currentFiltered, setCurrentFiltered] = useState(props.DBListings);
+  const [currentFiltered, setCurrentFiltered] = useState<ListOfProducts>(props.DBListings);
   const [categoryArr, setCategoryArr] = useState<string[]>([]);
   const [colorsArr, setColorsArr] = useState<string[]>([]);
 
@@ -26,13 +27,13 @@ export const Searchbox = (props: any) => {
 
   const filterDatabase = (color: string[], category: string[], minPrice: string, maxPrice: string) => {
     console.time("filtering database");
-    let filterColor;
+    let filterColor: ListOfProducts;
     // if no color is choosen
     if (color.length === 0) {
       filterColor = props.DBListings;
     } else {
       // if colors are choosen
-      filterColor = props.DBListings.filter((entry: any) => {
+      filterColor = props.DBListings.filter((entry: SingleProduct) => {
         if (entry.node.colorFamily === null) return;
         if (color.length === 1) {
           // one color is choosen
@@ -40,7 +41,7 @@ export const Searchbox = (props: any) => {
         } else if (color.length > 1) {
           // more than one color is choosen
           if (color.length > 1 && entry.node.colorFamily.length > 1) {
-            const productColors = entry.node.colorFamily.map((color: any) => color.name);
+            const productColors = entry.node.colorFamily.map((color: {name: string}) => color.name);
             let checker = color.every((col) => productColors.includes(col));
             if (checker) return entry;
           }
@@ -54,7 +55,7 @@ export const Searchbox = (props: any) => {
       filterCategory = filterColor;
     } else {
       // if categories are choosen
-      filterCategory = filterColor.filter((entry: any) => {
+      filterCategory = filterColor.filter((entry: SingleProduct) => {
         if (entry.node.categoryTags === null || entry.node?.categoryTags.length < 1) return;
         if (category.length === 1) {
           // one category is choosen
@@ -62,15 +63,15 @@ export const Searchbox = (props: any) => {
         } else if (category.length > 1) {
           // more than one category is choosen
           if (category.length > 1 && entry.node.categoryTags !== null && entry.node.categoryTags.length > 1) {
-            let checker = category.every((cat) => entry.node.categoryTags.includes(cat));
+            let checker = category.every((cat) => entry.node.categoryTags!.includes(cat));
             if (checker) return entry;
           }
         }
       });
     }
 
-    const filterPrice = filterCategory.filter((entry: any) => {
-      return entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice && entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice;
+    const filterPrice = filterCategory.filter((entry: SingleProduct) => {
+      return +entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice && +entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice;
     });
     console.timeEnd("filtering database");
     return filterPrice;
@@ -96,7 +97,7 @@ export const Searchbox = (props: any) => {
     [...document.querySelectorAll<HTMLInputElement>("form#category input[type=checkbox]:checked")].forEach((check) => category.push(check.value));
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
-    const filteredDatabase: any = filterDatabase(color, category, minPrice, maxPrice);
+    const filteredDatabase: ListOfProducts = filterDatabase(color, category, minPrice, maxPrice);
     setCurrentFiltered(filteredDatabase);
   };
 

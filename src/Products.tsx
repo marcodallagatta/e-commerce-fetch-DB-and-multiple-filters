@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
+import { SingleProduct, ListOfProducts } from "../TSinterfaces";
 import Product from "./Product";
 
-const Products = (props: any) => {
-  const [currentPagination, setCurrentPagination] = useState<string[] | null>(null);
+const Products = (props: { currentFiltered: ListOfProducts }) => {
+  const [currentPagination, setCurrentPagination] = useState<ListOfProducts | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const itemsPerPage = 20;

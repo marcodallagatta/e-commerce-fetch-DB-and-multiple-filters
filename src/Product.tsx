@@ -1,8 +1,10 @@
-function Product(props: { currentPagination: string[] | null }) {
+import { SingleProduct, ListOfProducts } from "../TSinterfaces";
+
+function Product(props: { currentPagination: ListOfProducts | null }) {
   return (
     <div className="items">
       {props.currentPagination &&
-        props.currentPagination.map((item: any, index: number) => {
+        props.currentPagination.map((item: SingleProduct, index: number) => {
           return (
             <div className="singleItem" key={index}>
               {item.node.name}
