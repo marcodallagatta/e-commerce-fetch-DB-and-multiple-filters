@@ -145,7 +145,7 @@ export const Searchbox = (props: { DBListings: ListOfProducts }) => {
         type="number"
         min="0"
         max="1000"
-        step="25"
+        step="5"
         defaultValue="0"
         onChange={() => {
           updateSearchValues();
@@ -156,9 +156,9 @@ export const Searchbox = (props: { DBListings: ListOfProducts }) => {
         ref={maxPriceDOM}
         type="number"
         min="0"
-        max="1000"
-        step="25"
-        defaultValue="1000"
+        max="525"
+        step="5"
+        defaultValue="525"
         onChange={() => {
           updateSearchValues();
           matchMinToMax();
