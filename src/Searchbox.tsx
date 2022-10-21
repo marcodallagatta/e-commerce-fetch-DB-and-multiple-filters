@@ -15,12 +15,8 @@ export const Searchbox = (props: any) => {
 
   const populateFilters = () => {
     for (const i in props.DBListings) {
-      props.DBListings[i].node.categoryTags?.forEach((elem: string) =>
-        categorySet.add(elem)
-      );
-      props.DBListings[i].node.colorFamily?.forEach((elem: { name: string }) =>
-        colorsSet.add(elem.name)
-      );
+      props.DBListings[i].node.categoryTags?.forEach((elem: string) => categorySet.add(elem));
+      props.DBListings[i].node.colorFamily?.forEach((elem: { name: string }) => colorsSet.add(elem.name));
     }
     setCategoryArr(Array.from(categorySet));
     setColorsArr(Array.from(colorsSet));
@@ -28,12 +24,7 @@ export const Searchbox = (props: any) => {
     colorsSet.clear();
   };
 
-  const filterDatabase = (
-    color: string[],
-    category: string[],
-    minPrice: string,
-    maxPrice: string
-  ) => {
+  const filterDatabase = (color: string[], category: string[], minPrice: string, maxPrice: string) => {
     console.time("filtering database");
     let filterColor;
     // if no color is choosen
@@ -49,9 +40,7 @@ export const Searchbox = (props: any) => {
         } else if (color.length > 1) {
           // more than one color is choosen
           if (color.length > 1 && entry.node.colorFamily.length > 1) {
-            const productColors = entry.node.colorFamily.map(
-              (color: any) => color.name
-            );
+            const productColors = entry.node.colorFamily.map((color: any) => color.name);
             let checker = color.every((col) => productColors.includes(col));
             if (checker) return entry;
           }
@@ -66,24 +55,14 @@ export const Searchbox = (props: any) => {
     } else {
       // if categories are choosen
       filterCategory = filterColor.filter((entry: any) => {
-        if (
-          entry.node.categoryTags === null ||
-          entry.node?.categoryTags.length < 1
-        )
-          return;
+        if (entry.node.categoryTags === null || entry.node?.categoryTags.length < 1) return;
         if (category.length === 1) {
           // one category is choosen
           return entry.node.categoryTags[0] === category[0];
         } else if (category.length > 1) {
           // more than one category is choosen
-          if (
-            category.length > 1 &&
-            entry.node.categoryTags !== null &&
-            entry.node.categoryTags.length > 1
-          ) {
-            let checker = category.every((cat) =>
-              entry.node.categoryTags.includes(cat)
-            );
+          if (category.length > 1 && entry.node.categoryTags !== null && entry.node.categoryTags.length > 1) {
+            let checker = category.every((cat) => entry.node.categoryTags.includes(cat));
             if (checker) return entry;
           }
         }
@@ -91,10 +70,7 @@ export const Searchbox = (props: any) => {
     }
 
     const filterPrice = filterCategory.filter((entry: any) => {
-      return (
-        entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice &&
-        entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice
-      );
+      return entry.node.shopifyProductEu.variants.edges[0].node.price >= +minPrice && entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice;
     });
     console.timeEnd("filtering database");
     return filterPrice;
@@ -102,46 +78,25 @@ export const Searchbox = (props: any) => {
 
   // keep max currency value higher than minumum and in between its min and max range
   const matchMaxToMin = () => {
-    if (
-      +minPriceDOM.current.value >= +maxPriceDOM.current.value &&
-      +maxPriceDOM.current.value <=
-        +maxPriceDOM.current.max - +maxPriceDOM.current.step
-    ) {
-      maxPriceDOM.current.value = (
-        +minPriceDOM.current.value + +maxPriceDOM.current.step
-      ).toString();
+    if (+minPriceDOM.current.value >= +maxPriceDOM.current.value && +maxPriceDOM.current.value <= +maxPriceDOM.current.max - +maxPriceDOM.current.step) {
+      maxPriceDOM.current.value = (+minPriceDOM.current.value + +maxPriceDOM.current.step).toString();
     }
   };
   // keep min currency value lower than maximum and in between its min and max range
   const matchMinToMax = () => {
-    if (
-      +maxPriceDOM.current.value <= +minPriceDOM.current.value &&
-      +minPriceDOM.current.value >=
-        +minPriceDOM.current.min + +minPriceDOM.current.step
-    ) {
-      minPriceDOM.current.value = (
-        +maxPriceDOM.current.value - +minPriceDOM.current.step
-      ).toString();
+    if (+maxPriceDOM.current.value <= +minPriceDOM.current.value && +minPriceDOM.current.value >= +minPriceDOM.current.min + +minPriceDOM.current.step) {
+      minPriceDOM.current.value = (+maxPriceDOM.current.value - +minPriceDOM.current.step).toString();
     }
   };
 
   const updateSearchValues = () => {
     let color: string[] = [];
     let category: string[] = [];
-    document
-      .querySelectorAll("form#colors input[type=checkbox]:checked")
-      .forEach((check) => color.push(check.value));
-    categoryDOM.current
-      .querySelectorAll("form#category input[type=checkbox]:checked")
-      .forEach((check) => category.push(check.value));
+    [...document.querySelectorAll<HTMLInputElement>("form#colors input[type=checkbox]:checked")].forEach((check) => color.push(check.value));
+    [...document.querySelectorAll<HTMLInputElement>("form#category input[type=checkbox]:checked")].forEach((check) => category.push(check.value));
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
-    const filteredDatabase: any = filterDatabase(
-      color,
-      category,
-      minPrice,
-      maxPrice
-    );
+    const filteredDatabase: any = filterDatabase(color, category, minPrice, maxPrice);
     setCurrentFiltered(filteredDatabase);
   };
 
@@ -156,12 +111,7 @@ export const Searchbox = (props: any) => {
 
   return (
     <>
-      <form
-        ref={colorDOM}
-        title="colors"
-        id="colors"
-        onChange={updateSearchValues}
-      >
+      <form ref={colorDOM} title="colors" id="colors" onChange={updateSearchValues}>
         <>
           <div>Please select one or more colors:</div>
           {colorsArr.map((color) => {
@@ -174,12 +124,7 @@ export const Searchbox = (props: any) => {
           })}
         </>
       </form>
-      <form
-        ref={categoryDOM}
-        title="category"
-        id="category"
-        onChange={updateSearchValues}
-      >
+      <form ref={categoryDOM} title="category" id="category" onChange={updateSearchValues}>
         <>
           <div>Please select one or more categories:</div>
           {categoryArr.map((category) => {

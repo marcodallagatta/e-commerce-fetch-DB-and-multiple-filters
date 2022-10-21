@@ -3,7 +3,7 @@ import ReactPaginate from "react-paginate";
 import Product from "./Product";
 
 const Products = (props: any) => {
-  const [currentPagination, setCurrentPagination] = useState(null);
+  const [currentPagination, setCurrentPagination] = useState<string[] | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const itemsPerPage = 20;
@@ -15,21 +15,14 @@ const Products = (props: any) => {
   }, [itemOffset, props.currentFiltered]);
 
   const handlePageClick = (event: any) => {
-    const newOffset =
-      (event.selected * itemsPerPage) % props.currentFiltered.length;
+    const newOffset = (event.selected * itemsPerPage) % props.currentFiltered.length;
     setItemOffset(newOffset);
   };
 
   return (
     <>
       <Product currentPagination={currentPagination} />
-      <ReactPaginate
-        nextLabel="next >"
-        onPageChange={handlePageClick}
-        pageCount={pageCount}
-        previousLabel="< previous"
-        containerClassName={"pagination"}
-      />
+      <ReactPaginate nextLabel="next >" onPageChange={handlePageClick} pageCount={pageCount} previousLabel="< previous" containerClassName={"pagination"} />
     </>
   );
 };
