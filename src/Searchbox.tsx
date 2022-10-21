@@ -34,35 +34,33 @@ export const Searchbox = (props: any) => {
     minPrice: string,
     maxPrice: string
   ) => {
-    console.log(color);
+    console.time("filtering database");
     let filterColor;
     // if no color is choosen
     if (color.length === 0) {
       filterColor = props.DBListings;
-    } else if (color.length === 1) {
-      filterColor = props.DBListings.filter((entry: any) => {
-        // if there is a color for the product
-        if (entry.node.colorFamily !== null) {
-          // if a single color is available for product
-          return entry.node.colorFamily[0].name === color[0];
-        }
-      });
     } else {
+      // if colors are choosen
       filterColor = props.DBListings.filter((entry: any) => {
-        // if there is a color for the product
-        if (entry.node.colorFamily !== null) {
-          if (color.length > 1 && entry.node.colorFamily.length > 1) {
-            // if multiple colors are available for product
-            const productColors = entry.node.colorFamily.map(
-              (color: any) => color.name
-            );
-            let checker = color.every((col) => productColors.includes(col));
-            if (checker) return entry;
+        if (color.length === 1) {
+          // one color is choosen
+          if (entry.node.colorFamily !== null) {
+            return entry.node.colorFamily[0].name === color[0];
+          }
+        } else if (color.length > 1) {
+          // more than one color is choosen
+          if (entry.node.colorFamily !== null) {
+            if (color.length > 1 && entry.node.colorFamily.length > 1) {
+              const productColors = entry.node.colorFamily.map(
+                (color: any) => color.name
+              );
+              let checker = color.every((col) => productColors.includes(col));
+              if (checker) return entry;
+            }
           }
         }
       });
     }
-    console.log(filterColor);
 
     let filterCategory;
     if (category === "Category") {
@@ -80,6 +78,7 @@ export const Searchbox = (props: any) => {
         entry.node.shopifyProductEu.variants.edges[0].node.price <= +maxPrice
       );
     });
+    console.timeEnd("filtering database");
     return filterPrice;
   };
 
@@ -109,7 +108,6 @@ export const Searchbox = (props: any) => {
   };
 
   const updateSearchValues = () => {
-    console.log("search values");
     let color: string[] = [];
     colorDOM.current
       .querySelectorAll("input[type=checkbox]:checked")
@@ -117,14 +115,12 @@ export const Searchbox = (props: any) => {
     const category = categoryDOM.current.selectedOptions[0].value;
     const minPrice = minPriceDOM.current.value;
     const maxPrice = maxPriceDOM.current.value;
-    console.time("filterDatabase");
     const filteredDatabase: any = filterDatabase(
       color,
       category,
       minPrice,
       maxPrice
     );
-    console.timeEnd("filterDatabase");
     setCurrentFiltered(filteredDatabase);
   };
 
