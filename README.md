@@ -1,4 +1,4 @@
-# eCommerce Fetch DD with Multiple Filters
+# eCommerce Fetch DB with Multiple Filters
 
 This is a React app where I tried to make a very simple, yet efficient, multiple filtering system for an eCommerce platform.
 
